@@ -1,0 +1,1 @@
+trial,condition,phone,calibrationId,frameWidth,frameHeight,markerId,markerSizeMm,cameraHeightM,gtX_m,gtY_m,estimatedX_m,estimatedY_m,slantM,rmsPx,detected,elapsedMs,note

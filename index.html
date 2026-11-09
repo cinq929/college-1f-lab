@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>循展 · 学院空间实验室</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><a class="brand" href="./">循展<span> / 空间实验室</span></a><span class="badge">一层 · 布点草案</span></header>
+<main>
+  <div class="heading"><div><p class="eyebrow">XUNZHAN / SPATIAL STUDY 01</p><h1>先认识空间，再确认位置。</h1><p>上海交通大学设计学院 · 根据小组平面图描摹的低墙模型</p></div><button id="export">导出当前布点 JSON ↗</button></div>
+  <p><a href="guide.html">组员使用说明：先看操作与实验步骤 →</a></p>
+  <label>底图与坐标版本（切换前导出保存）<select id="plan-source"><option value="architecture">建筑原图一层 · 带比例尺</option><option value="legacy">旧导视图 · 原实验</option></select></label><p id="plan-description"></p>
+  <div class="notice" id="scale-status">示意坐标，尚未定标。模型不能替代现场测量。</div>
+  <div class="workspace">
+    <section class="viewer">
+      <div class="toolbar"><div class="tabs"><button data-view="3d" aria-pressed="true">三维模型</button><button data-view="2d" aria-pressed="false">平面与布点</button></div><button id="reset-view">复位视角</button></div>
+      <div class="sim-buttons map-tools"><button data-tool="person" aria-pressed="true">编辑／放人物</button><button data-tool="marker" aria-pressed="false">拖码位</button><button data-tool="browse" aria-pressed="false">只浏览</button><button id="focus-marker">放大到所选码</button></div>
+      <p class="map-help">调整布点：直接拖住彩色圆点移动码位；拖空白移动整图。点太小时，先选右侧 ID，再点“放大到所选码”。</p>
+      <div class="canvas-wrap"><canvas id="scene" aria-label="学院一层模型，可旋转查看；二维模式可点击模拟位置"></canvas><div class="view-label" id="view-label">低墙轴测 / 拖动旋转 · 滚轮缩放</div></div>
+      <div class="legend"><span><i class="yellow"></i>候选标记</span><span><i class="blue"></i>编辑码位</span><span><i style="background:#a647a2"></i>声音目标</span><span><i style="background:#087ea4"></i>引导路径</span><span><i class="red"></i>模拟人物／扫描相机</span><span><i class="gray"></i>楼梯与阻挡</span></div>
+      <section id="planning-controls" class="sim-controls" hidden>
+        <h2>参观路线与布置实验</h2>
+        <p>只描摹一层外围走廊。绿色是导向路径建议，橙框是转向／停靠触觉提示候选；都不是已核验的盲道施工图。</p>
+        <div class="sim-buttons"><button id="short-tour">先试 12m 短段：0 → 1</button><button id="full-tour">恢复外围参观环线</button></div>
+        <div class="fields"><label>识别斜距上限 m<input id="scan-range" type="number" min="0.1" max="10" step="0.1" value="2"></label><label>相机高度 m<input id="scan-height" type="number" min="0" max="3" step="0.1" value="1.2"></label></div>
+        <div class="fields"><label>补码候选上限<input id="extra-budget" type="number" min="0" max="300" step="1" value="150"></label><label>贴码方案<select id="placement-mode"><option value="critical">关键点稀疏贴码</option><option value="greedy">距离／视线覆盖补码</option></select></label></div>
+        <div class="sim-buttons"><button id="recompute-study">按以上参数重算</button><label><input id="show-tactile" type="checkbox" checked>触觉引导建议</label><label><input id="show-coverage" type="checkbox" checked>显示未覆盖采样点</label></div>
+        <pre id="placement-status"></pre>
+        <p>相机视场、倾角、光照、真实遮挡和成功率尚未建模。P 点仅为新增建议，不会冒充可识别 ID。稀疏方案丢码时没有连续位置；不能依靠声音独自跨过空白段。</p>
+        <p><a href="architecture/research.md" download>算法依据与实验步骤</a> · <a href="architecture/experiment-template.csv" download>空白实验记录CSV</a> · <a href="architecture/source-plan.png" target="_blank" rel="noopener">原始双层图及比例尺</a> · <a href="architecture/route-overlay.png" target="_blank" rel="noopener">路线布置图</a></p>
+      </section>
+      <section class="sim-controls" aria-label="模拟行走与耳机指引">
+        <h2>路线规划与模拟指引</h2>
+        <label>参观顺序（填写已有 ID，可重复经过同一站）<input id="tour-order" value="0, 2, 1, 3"></label><button id="apply-tour">应用参观顺序</button><p id="tour-status" role="status"></p>
+        <p id="placement-intro">实体码先放入口停留区、转角前、作品停靠区；虚线中的绕行拐点由算法生成，不必每个拐点都贴码。先现场核对门洞与通道。</p>
+        <div class="fields"><label>声音引导目标<select id="guide-target"></select></label><label>人物朝向 °（0 向图上，90 向右）<input id="heading" type="number" value="0" step="15"></label></div>
+        <p id="sim-step">↑ 前进，↓ 后退，← 左转 15°，→ 右转 15°。点击平面图或三维地面放置模拟人物；红色箭头表示听觉朝向。</p>
+        <div class="sim-buttons"><button data-action="left">← 左转</button><button data-action="forward">↑ 前进</button><button data-action="back">↓ 后退</button><button data-action="right">→ 右转</button><button id="next-target">下一目标点</button></div>
+        <div class="sim-buttons"><button id="sound-start">开启方向提示音</button><button id="sound-stop">停止声音</button><button id="ear-left">测试左耳</button><button id="ear-right">测试右耳</button></div>
+        <div class="fields"><label>音量<input id="sound-volume" type="range" min="0" max="0.5" step="0.01" value="0.15"></label><label><input id="swap-ears" type="checkbox">交换左右声道</label></div>
+        <p id="sound-status" role="status">声音未开启</p><pre id="guide-debug">等待模拟位置</pre>
+        <p class="hint">左右按人物朝向计算，转模型镜头不会改变声像。左／右增益采用等功率分配；正前和正后均可能左右相等，身后用较低音色提示。声音指向蓝色路径的下一可见路径点；到达后静音，再按“下一目标点”。仅供模拟，不使用手机朝向代替头朝向。</p>
+      </section>
+      <div class="readout" aria-live="polite"><span class="eyebrow" id="source">模拟观测 · 非真实扫描</span><h2 id="region">主入口门厅</h2><p id="result">选择标记查看位置关系。</p><div id="nearby"></div></div>
+    </section>
+    <aside>
+      <section><p class="eyebrow">01 / MARKERS</p><h2>地面标记候选点</h2><label>当前标记<select id="marker"></select></label><p id="reason"></p><div class="fields"><label>黑框边长 mm<input id="size" type="number" min="10" max="2000" step="1"></label><label>安装转角 °<input id="yaw" type="number" step="1"></label></div><p class="hint">0°：码顶部朝图上方。80 mm 只是初始值，按实际打印黑框修改。</p><div class="fields"><label>图像 X<input id="mx" type="number" min="0" max="1706"></label><label>图像 Y<input id="my" type="number" min="0" max="880"></label></div><button id="move">在平面图点击移动此标记</button><p id="marker-status" class="hint"></p></section>
+      <section><p class="eyebrow">02 / SCALE</p><h2>用现场长度定标</h2><p>切换到平面图，选同一段墙或通道的两个端点，再填实际长度。</p><button id="pick-scale">选取两个端点</button><p id="reference" class="hint">尚未选择参考线</p><label>参考线实测长度 m<input id="length" type="number" min="0.01" step="0.01" placeholder="例如现场量得的长度"></label><button id="apply-scale">应用比例</button><button id="clear-scale" class="text">清除定标</button><p class="hint">单线定标假设图片未拉伸；请再量另一段核验。不会自动消除透视变形。</p></section>
+      <section><p class="eyebrow">03 / OBSERVATION</p><h2>扫描与位置换算</h2><label>输入来源<select id="mode"><option value="demo">模拟：在平面图点选手机位置</option><option value="live">手机实时扫描（需定标与相机标定）</option><option value="range">手动：只有斜距与相机高度</option><option value="bearing">手动：再给出码坐标系中的方位</option><option value="pose">导入实验页位姿记录（历史）</option></select></label>
+      <div id="live-input" hidden><label>本机相机标定 calibration.json<input id="live-calibration" type="file" accept=".json,application/json"></label><p class="hint" id="live-cal-status">尚未导入；须与当前手机镜头和视频尺寸一致。</p><button id="live-start">开始实时扫描</button><button id="live-stop">停止摄像头</button><video id="camera" autoplay playsinline muted aria-label="实时扫描画面"></video><p id="live-status" role="status"></p><p class="hint">使用登记的实际码体尺寸与安装方向；需要 HTTPS 或电脑 localhost。只接受连续合格的严格位姿；单平面双解未消除，位置仍是实验估计。</p></div>
+      <div id="manual" hidden><div class="fields"><label>相机到码斜距 m<input id="distance" type="number" min="0.01" step="0.01" value="2"></label><label>相机离地高度 m<input id="height" type="number" min="0" step="0.01" value="1.2"></label></div><label id="bearing-field" hidden>码中心看向相机的方位 °<input id="bearing" type="number" value="0" step="1"></label><p class="hint">方位以码右侧为 0°，逆时针朝码顶部为 90°。手机看向码的画面方位不能直接填这里；距离必须来自已标定测量。</p><button id="calculate">换算位置／范围</button></div>
+      <div id="pose-input" hidden><label>实验页导出的 experiments.json<input id="observations" type="file" accept=".json,application/json"></label><label>选择观测<select id="record"></select></label><button id="locate">用所选观测定位</button><p class="hint">需要完整 rvec、tvec（米）、ID、sizeMm、calibrationId、solver 和 rmsPx；码位与安装方向须与现场一致。丢码期间没有新位置。</p></div>
+      <p id="observation-status" role="status"></p><button id="demo-reset" class="text">回到入口模拟位置</button></section>
+    </aside>
+  </div>
+  <footer>墙线、通行区及码位均待现场核对；不做避障或安全通行保证。手机位置 ≠ 身体中心／头朝向。<a id="model-download" href="college-1f.glb" download>下载 GLB 低墙模型</a></footer>
+</main><script src="vendor/cv.js"></script><script src="vendor/aruco.js"></script><script src="vendor/lab-pose.js"></script><script type="module" src="app.js"></script></body></html>
